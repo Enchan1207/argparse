@@ -19,7 +19,7 @@ target_sources(argparse_test PRIVATE
     test_argparse.cpp
 )
 target_link_libraries(argparse_test PRIVATE
-    tinystr
+    argparse
     GTest::gtest_main
 )
 target_include_directories(argparse_test

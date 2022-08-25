@@ -10,6 +10,12 @@ project(argparse
     LANGUAGES C CXX
 )
 
+# optional使いたかった
+enable_language(CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 # ソースディレクトリ
 add_subdirectory(src)
 
@@ -20,7 +26,6 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     if(ARGPARSE_BUILD_TESTS)
         message(NOTICE "testing enabled")
         enable_testing()
-        set(CMAKE_CXX_STANDARD 14) # GoogleTestはC++14以上が必要
         add_subdirectory(tests)
     endif()
 endif()
