@@ -13,13 +13,24 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 include(GoogleTest) # gtest_系関数の読み込み
 
+# argvの生成に使う
+include(FetchContent)
+FetchContent_Declare(
+    tinystr
+    GIT_REPOSITORY https://github.com/Enchan1207/tinystr.git
+    GIT_TAG v0.2.0
+)
+FetchContent_MakeAvailable(tinystr)
+
 # テストターゲットの構成
 add_executable(argparse_test)
 target_sources(argparse_test PRIVATE
     test_argparse.cpp
+    test_argument.cpp
 )
 target_link_libraries(argparse_test PRIVATE
     argparse
+    tinystr
     GTest::gtest_main
 )
 target_include_directories(argparse_test
