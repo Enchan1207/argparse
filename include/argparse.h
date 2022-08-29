@@ -1,58 +1,32 @@
-//
-//
-//
+/**
+ * @file argparse.h
+ * @brief メインヘッダ
+ */
 
-#pragma once
+#ifndef ARGPARSE_ARGPARSE_H
+#define ARGPARSE_ARGPARSE_H
 
-#include <map>
-#include <optional>
-#include <string>
 #include <vector>
 
-enum class OptArgType {
-    kNone,
-    kRequired,
-    kOptional
-};
+#include "argument.h"
 
-class Argument {
+namespace argparse {
+
+class ArgumentParser final {
    private:
-    const std::optional<std::string> longname;
-    const std::optional<char> shortname;
-    const OptArgType optargtype;
-    const std::string description;
+    std::vector<Option> options;
+    std::vector<Operand> operands;
 
    public:
-    Argument(std::optional<std::string> const& longname, std::optional<char> shortname, OptArgType optargtype, std::string const& description)
-        : longname(longname),
-          shortname(shortname),
-          optargtype(optargtype),
-          description(description) {}
+    ArgumentParser() = default;
+    ~ArgumentParser() = default;
 
-    ~Argument();
+    void add(const Option &option);
+    void add(const Operand &operand);
+
+    void parse(const int argc, char const *argv[]);
 };
 
-class ArgumentParser {
-   private:
-    std::vector<Argument> arguments;
+}  // namespace argparse
 
-   public:
-    ArgumentParser();
-    explicit ArgumentParser(std::vector<Argument> const& arguments)
-        : arguments(arguments) {}
-    ~ArgumentParser();
-
-    void addArgument(std::string longname, char shortname, std::string const& description);
-    void addArgument(std::string longname, char shortname, OptArgType type, std::string const& description);
-
-    void addArgument(std::string longname, std::string const& description);
-    void addArgument(std::string longname, OptArgType type, std::string const& description);
-
-    void addArgument(char shortname, std::string const& description);
-    void addArgument(char shortname, OptArgType type, std::string const& description);
-
-    std::map<std::string, std::string, std::less<>> parse(int argc, char* argv[]) const;
-    std::map<std::string, std::string, std::less<>> parse(const std::vector<std::string>& args) const;
-
-    std::string getUsage() const;
-};
+#endif /* ARGPARSE_ARGPARSE_H */

@@ -1,49 +1,50 @@
-//
-//
-//
+/**
+ * @file parser.cpp
+ * @brief パース処理
+ */
 #include <argparse.h>
 
-ArgumentParser::ArgumentParser() = default;
+#include <cassert>
+#include <string>
 
-ArgumentParser::~ArgumentParser() = default;
+namespace argparse {
 
-void ArgumentParser::addArgument(std::string longname, char shortname, std::string const& description) {
-    arguments.emplace_back(longname, shortname, OptArgType::kNone, description);
+void ArgumentParser::add(const Option &option) {
+    // 空白を含まない
+    assert(option.name.find(" ") == std::string::npos);
+
+    // 先頭にハイフンがこない (nameにハイフンは必要ない)
+    assert(option.name.find("-") != 0);
+
+    std::for_each(options.begin(), options.end(), [&](const Option &opt) {
+        assert(opt.name != option.name);
+
+        // ショートオプションを受け入れ可能な場合、
+        // 頭文字は重複してはならない
+        if (option.nametype != OptNameType::Long) {
+            assert(opt.name[0] != option.name[0]);
+        }
+    });
+
+    options.push_back(option);
 }
 
-void ArgumentParser::addArgument(std::string longname, char shortname, OptArgType type, std::string const& description) {
-    arguments.emplace_back(longname, shortname, type, description);
-}
-
-void ArgumentParser::addArgument(std::string longname, std::string const& description) {
-    arguments.emplace_back(longname, std::nullopt, OptArgType::kNone, description);
-}
-
-void ArgumentParser::addArgument(std::string longname, OptArgType type, std::string const& description) {
-    arguments.emplace_back(longname, std::nullopt, type, description);
-}
-
-void ArgumentParser::addArgument(char shortname, std::string const& description) {
-    arguments.emplace_back(std::nullopt, shortname, OptArgType::kNone, description);
-}
-
-void ArgumentParser::addArgument(char shortname, OptArgType type, std::string const& description) {
-    arguments.emplace_back(std::nullopt, shortname, type, description);
-}
-
-std::map<std::string, std::string, std::less<>> ArgumentParser::parse(int argc, char* argv[]) const {
-    // argvをvectorに変換して、parse(std::vector)を呼び出す
-    std::vector<std::string> args;
-    for (int i = 0; i < argc; i++) {
-        args.emplace_back(argv[i]);
+void ArgumentParser::add(const Operand &operand) {
+    // オペランドの最後の型が std::vector<std::string>のとき、
+    // 新たに追加することはできない
+    if (!operands.empty()) {
+        assert(!std::holds_alternative<std::vector<std::string>>(operands.back().value.get()));
     }
-    return parse(args);
+
+    std::for_each(operands.begin(), operands.end(), [&](const Operand &opr) {
+        assert(opr.name != operand.name);
+    });
+
+    operands.push_back(operand);
 }
 
-std::map<std::string, std::string, std::less<>> ArgumentParser::parse(const std::vector<std::string>& args) const {
-    /* パースのメイン部分 */
+void ArgumentParser::parse(const int argc, char const *argv[]) {
+    // TODO: implement
 }
 
-std::string ArgumentParser::getUsage() const {
-    return "";
-}
+}  // namespace argparse
